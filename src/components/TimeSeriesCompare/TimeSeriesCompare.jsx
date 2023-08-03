@@ -40,6 +40,7 @@ const TimeSeriesCompare = () => {
             .sort(([, a], [, b]) => b - a)
             .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
+
         await setWordRank(sorted);
         await setMonthList(getMonthList());
         await setWordList(Object.keys(sorted).slice(0, 5));
@@ -51,6 +52,7 @@ const TimeSeriesCompare = () => {
         console.log(wordTfidf[0][chosenWord]);
         console.log(frequencyList[0]);
         console.log(monthList);
+        console.log(wordRank);
         setChosenWord(Object.keys(wordRank)[idx]);
         setChosenIndex(idx);
     };

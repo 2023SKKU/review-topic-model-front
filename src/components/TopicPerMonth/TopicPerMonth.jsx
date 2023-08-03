@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const TopicPerMonth = ({ month, topicObj }) => {
+const TopicPerMonth = ({ month, topicObj, chosenWord, chosenTopic, chosenMonth, changeChosenWord }) => {
+
     return (
         <>
             <MonthWrapper>
@@ -10,7 +11,10 @@ const TopicPerMonth = ({ month, topicObj }) => {
                     {topicObj[month].map((words, idx) => {
                         return (
                             <KeywordElement>
-                                {words.split(', ').slice(0, 5).join(' ')}
+                                {words.split(', ').slice(0, 5).map((innerWord, idx2) => {
+                                    if (innerWord !== '')
+                                        return <WordContainer chosen={innerWord === chosenWord && idx == chosenTopic && month == chosenMonth} onClick={() => changeChosenWord(innerWord, idx, month)}>{innerWord}</WordContainer>
+                                })}
                             </KeywordElement>
                         );
                     })}
@@ -56,12 +60,12 @@ const KeywordElement = styled.div`
     box-sizing: border-box;
     border-bottom: 1px solid black;
     height: 53px;
-    line-height: 50px;
     padding-left: 10px;
     padding-right: 10px;
     white-space: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
+    display: flex;
     &::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -80,6 +84,15 @@ const KeywordElement = styled.div`
     &::-webkit-scrollbar-thumb:active {
         background: rgba(0, 0, 0, 0.9);
     }
+`;
+
+const WordContainer = styled.div`
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    background-color: ${(props) => (props.chosen ? 'rgba(238, 230, 196, 1)' : 'rgba(238, 230, 196, 0.5)')};
+    margin-right: 10px;
 `;
 
 export default TopicPerMonth;
