@@ -1,30 +1,60 @@
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
-import ShowBasicTopics from './components/ShowBasicTopics/ShowBasicTopics';
-import ShowDTM from './components/ShowDTM/ShowDTM';
-import TimeSeriesCompare from './components/TimeSeriesCompare/TimeSeriesCompare';
-import GlobalStyle from './components/GlobalStyle/GlobalStyle';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Home, Analysis, List } from './pages';
+import { v4 } from 'uuid';
+import { processStatus } from './util/getData';
+import { heartbeat, deleteUser, addUser } from './util/getData';
+import GlobalStyle from './components/GlobalStyle';
+
+// export const AppContext = createContext();
+
+let clientID = v4();
 
 function App() {
-    const topicList = [
-        ['맛있', '배송', '빠르', '구매', '주문', '가슴살', '다이어트', '시키', '만족', '감사'],
-        ['소스', '소세지', '샐러드', '안전', '저녁', '간식', '맛있', '소시지', '아이', '가슴살'],
-        ['종류', '리뷰', '질리', '구매', '맛있', '소스', '크리스', '가격', '대비', '입맛'],
-        ['만두', '최고', '아임닭', '마트', '추천', '구매', '시키', '찌우', '맛있', '가슴살'],
-    ];
+    // const webSocket = useRef(null);
+    // const wsUrl = 'ws://localhost:8000/ws/';
+
+    const [analysisStatus, setAnalysisStatus] = useState(processStatus.BEFORE_START);
+
+    const handleAddUser = async () => {
+        await addUser(clientID);
+    }
+
+    useEffect(() => {
+        // console.log(wsUrl+clientID);
+        // if (localStorage['analysisStatus'] != undefined) {
+        //     if (localStorage['analysisStatus'] == '5') setAnalysisStatus(0);
+        //     else setAnalysisStatus(Number(localStorage['analysisStatus']));
+        // }
+        // startSocket();
+        // clientID ??= v4();
+        handleAddUser();
+        const hb = setInterval(async () => {
+            console.log('sdfg', analysisStatus);
+            // if (analysisStatus != processtatus.BEFORE_START) {
+                const res = await heartbeat(clientID);
+                console.log(res);
+                setAnalysisStatus(res);
+            // }
+        }, 20000);
+
+        return () => {
+            clearInterval(hb);
+            deleteUser(clientID);
+        };
+      }, []);
+
     return (
         <>
             <GlobalStyle />
-            <Wrapper>
-                <SectionDivier>
-                    <ShowBasicTopics topicList={topicList} />
-                </SectionDivier>
-                <SectionDivier>
-                    <ShowDTM></ShowDTM>
-                </SectionDivier>
-                <SectionDivier>
-                    <TimeSeriesCompare></TimeSeriesCompare>
-                </SectionDivier>
-            </Wrapper>
+            <BrowserRouter>
+                <Routes>
+                    <Route exact path="/" element={<Home clientID={clientID} status={analysisStatus} changeStatus={setAnalysisStatus} />} />
+                    <Route path="/list" element={<List />} />
+                    <Route path="/analysis/:productid" element={<Analysis />} />
+                </Routes>
+            </BrowserRouter>
         </>
     );
 }

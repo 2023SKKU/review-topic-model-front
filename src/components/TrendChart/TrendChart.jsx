@@ -25,8 +25,8 @@ export const options = {
             type: 'linear',
             display: true,
             position: 'left',
-            // min: 0,
-            // max: 1
+            min: 0,
+            max: 1
         },
     },
 };

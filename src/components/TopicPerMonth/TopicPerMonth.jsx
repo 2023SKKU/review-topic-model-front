@@ -1,23 +1,43 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-const TopicPerMonth = ({ month, topicObj, chosenWord, chosenTopic, chosenMonth, changeChosenWord }) => {
-
+const TopicPerMonth = ({ month, topicObj, onChange, chosenWord, chosenTopic, chosenMonth }) => {
     return (
         <>
             <MonthWrapper>
                 <MonthTitle>{month}</MonthTitle>
                 <KeywordsWrapper>
-                    {topicObj[month].map((words, idx) => {
-                        return (
-                            <KeywordElement>
-                                {words.split(', ').slice(0, 5).map((innerWord, idx2) => {
-                                    if (innerWord !== '')
-                                        return <WordContainer chosen={innerWord === chosenWord && idx == chosenTopic && month == chosenMonth} onClick={() => changeChosenWord(innerWord, idx, month)}>{innerWord}</WordContainer>
-                                })}
-                            </KeywordElement>
-                        );
-                    })}
+                    {month !== undefined ? (
+                        topicObj[month].map((words, idx) => {
+                            return (
+                                <KeywordElement key={idx}>
+                                    {words
+                                        .split(', ')
+                                        .slice(0, 5)
+                                        .map((innerWord, idx2) => {
+                                            if (innerWord !== '')
+                                                return (
+                                                    <WordContainer
+                                                        key={idx2}
+                                                        chosen={
+                                                            innerWord == chosenWord &&
+                                                            idx2 == chosenTopic &&
+                                                            month == chosenMonth
+                                                        }
+                                                        onClick={() =>
+                                                            onChange(innerWord, idx2, month)
+                                                        }
+                                                    >
+                                                        {innerWord}
+                                                    </WordContainer>
+                                                );
+                                        })}
+                                </KeywordElement>
+                            );
+                        })
+                    ) : (
+                        <></>
+                    )}
                 </KeywordsWrapper>
             </MonthWrapper>
         </>
@@ -25,17 +45,9 @@ const TopicPerMonth = ({ month, topicObj, chosenWord, chosenTopic, chosenMonth, 
 };
 
 const MonthWrapper = styled.div`
-    width: 300px;
+    width: 80%;
     height: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    flex-grow: 0;
-    flex-shrink: 0;
     overflow-x: auto;
-    flex-direction: column;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.2);
-    margin-right: 10px;
 `;
 
 const MonthTitle = styled.div`
@@ -43,6 +55,8 @@ const MonthTitle = styled.div`
     text-align: center;
     font-weight: bold;
     border-bottom: 2px solid black;
+    font-size: 1.2rem;
+    margin-top: 20px;
 `;
 
 const KeywordsWrapper = styled.div`
@@ -56,16 +70,17 @@ const KeywordsWrapper = styled.div`
 `;
 
 const KeywordElement = styled.div`
-    width: auto;
+    width: 100%;
     box-sizing: border-box;
     border-bottom: 1px solid black;
-    height: 53px;
+    height: 60px;
     padding-left: 10px;
     padding-right: 10px;
     white-space: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
     display: flex;
+    align-items: center;
     &::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -90,8 +105,11 @@ const WordContainer = styled.div`
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 5px;
+    height: 18px;
+    /* line-height: 18px; */
     margin-top: 5px;
-    background-color: ${(props) => (props.chosen ? 'rgba(238, 230, 196, 1)' : 'rgba(238, 230, 196, 0.5)')};
+    background-color: ${(props) =>
+        props.chosen ? 'rgba(238, 230, 196, 1)' : 'rgba(238, 230, 196, 0.5)'};
     margin-right: 10px;
 `;
 
