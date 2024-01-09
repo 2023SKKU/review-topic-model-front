@@ -1,5 +1,6 @@
 # Review analysis website
 
+developed by React (Vite)
 ### Package install
 ```
 npm install
