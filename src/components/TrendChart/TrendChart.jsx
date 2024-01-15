@@ -26,7 +26,7 @@ export const options = {
             display: true,
             position: 'left',
             min: 0,
-            max: 1
+            max: 100
         },
     },
 };

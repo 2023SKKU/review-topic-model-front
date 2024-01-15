@@ -9,9 +9,6 @@ import TrendChart from '../components/TrendChart/TrendChart';
 
 
 const Analysis = () => {
-    // 일단 하드코딩
-    // const dateList = ['20191230', '20200106', '20200113', '20200120', '20200127', '20200203', '20200210', '20200217', '20200224', '20200302', '20200309', '20200316', '20200323', '20200330', '20200406', '20200413', '20200420', '20200427', '20200504', '20200511', '20200518', '20200525', '20200601', '20200608', '20200615', '20200622', '20200629', '20200706', '20200713', '20200720', '20200727', '20200803', '20200810', '20200817', '20200824', '20200831', '20200907', '20200914', '20200921', '20200928', '20201005', '20201012', '20201019', '20201026', '20201102', '20201109', '20201116', '20201123', '20201130', '20201207', '20201214', '20201221', '20201228', '20210104', '20210111', '20210118', '20210125', '20210201', '20210208', '20210215', '20210222', '20210301', '20210308', '20210315', '20210322', '20210329', '20210405', '20210412', '20210419', '20210426', '20210503', '20210510', '20210517', '20210524', '20210531', '20210607', '20210614', '20210621', '20210628', '20210705', '20210712', '20210719', '20210726', '20210802', '20210809', '20210816', '20210823', '20210830', '20210906', '20210913', '20210920', '20210927', '20211004', '20211011', '20211018', '20211025', '20211101', '20211108', '20211115', '20211122', '20211129', '20211206', '20211213', '20211220', '20211227', '20220103', '20220110', '20220117', '20220124', '20220131', '20220207', '20220214', '20220221', '20220228', '20220307', '20220314', '20220321', '20220328', '20220404', '20220411', '20220418', '20220425', '20220502', '20220509', '20220516', '20220523', '20220530', '20220606', '20220613', '20220620', '20220627', '20220704', '20220711', '20220718', '20220725', '20220801', '20220808', '20220815', '20220822', '20220829', '20220905', '20220912', '20220919', '20220926', '20221003', '20221010', '20221017', '20221024', '20221031', '20221107', '20221114', '20221121', '20221128', '20221205', '20221212', '20221219', '20221226']
-
 
     const params = useParams();
 
@@ -22,6 +19,7 @@ const Analysis = () => {
     const [dtm, setDtm] = useState([]);
     const [trend, setTrend] = useState([]);
     const [dateList, setDateList] = useState([]);
+    const [trendWarning, setTrendWarning] = useState(false);
 
     const handleGetAnalysusResult = async () => {
         const res = await getAnalysisResult(params.productid);
@@ -31,16 +29,18 @@ const Analysis = () => {
             setPros(res.p_data[0].pros);
             setCons(res.p_data[0].cons);
             setTrend(res.p_data[0].trend);
+            setTrendWarning(res.p_data[0].trend_warning);
             setDtm(res.dtm_result);
             
             const startDateStr = res.p_data[0].trend_start_date;
             const startDate = new Date(Number(startDateStr.slice(0, 4)), Number(startDateStr.slice(4, 6)), Number(startDateStr.slice(6, 8)));
-            const endDateStr = res.p_data[0].trend_end_date;
-            const endDate = new Date(Number(endDateStr.slice(0, 4)), Number(endDateStr.slice(4, 6))-1, Number(endDateStr.slice(6, 8)));
+
             let dateListTemp = [];
-            while (startDate < endDate) {
+            let i = 0;
+            while (i < res.p_data[0].trend.length) {
                 dateListTemp.push(`${startDate.getFullYear()}. ${startDate.getMonth()+1}. ${startDate.getDate()}.`);
                 startDate.setDate(startDate.getDate()+7);
+                i += 1;
             }
             setDateList(dateListTemp);
         }
@@ -78,8 +78,9 @@ const Analysis = () => {
                     <ShowDTM productID={params.productid} dtmResult={dtm} />
                     <GraphWrapper>
                         <GraphText>트렌드 예측 그래프</GraphText>
+                        { trendWarning ? <SmallLoadingText>※ 지난 3개년 간의 검색량이 부족하여 예측의 정확도가 매우 낮을 수 있습니다.</SmallLoadingText> : <></>}
                         <div style={{width: '100%', display: 'flex', justifyContent: 'center', height: '80%'}}>
-                        {   trend.length == 0 ? <LoadingText>로딩중...</LoadingText> : <TrendChart frequency={trend} x={dateList} label="검색량 추이" />}
+                        {   trend.length == 0 ? <LoadingText>로딩중...</LoadingText> : (trend[0] === -1 ? <LoadingText>트렌드 예측이 수행되지 않았습니다.</LoadingText> : <TrendChart frequency={trend} x={dateList} label="검색량 추이" />)}
                         </div>
                     </GraphWrapper>
                 </LeftContainer>
@@ -145,6 +146,12 @@ const LoadingText = styled.div`
     color: rgba(0, 0, 0, 0.5);
     text-align: center;
     line-height: 240px;
+`;
+
+const SmallLoadingText = styled.div`
+    font-size: 1rem;
+    color: rgba(255, 0, 0, 0.5);
+    text-align: center;
 `;
 
 export default Analysis;

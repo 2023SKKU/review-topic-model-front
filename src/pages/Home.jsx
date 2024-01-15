@@ -52,7 +52,6 @@ const Home = ({clientID, status, changeStatus}) => {
                         <PaddingUL>
                             <SmallText>한 링크 당 최대 20,000개의 리뷰가 크롤링됩니다.</SmallText>
                             <SmallText>'시작하기' 버튼을 누르면 자동으로 분석까지 진행됩니다.</SmallText>
-                            <SmallText>현재 데모 버전으로 일부 키워드에 대해 분석이 진행되지 않을 수 있습니다.</SmallText>
                         </PaddingUL>
                         <NameText>상품 이름을 적어주세요</NameText><NameInput onChange={onChangeProductName} value={productName} placeholder='상품 이름' />
                         <NameText>상품 카테고리를 적어주세요</NameText><NameInput onChange={onChangeCategory} value={category} placeholder='카테고리' />
