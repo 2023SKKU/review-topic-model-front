@@ -88,4 +88,10 @@ const downloadCsv = async (filename) => {
     return null;
 };
 
-export { addUser, startAnalysis, downloadCsv, processStatus, getProjectList, getAnalysisResult, getOriginalReview, getWordTrend, heartbeat, deleteUser };
+const crawlProductBasicInfo = async (url) => {
+    const {data: data} = await axios.get(`${HOST}/basicinfo/?url=${url}`);
+    console.log(data);
+    return data;
+}
+
+export { addUser, startAnalysis, downloadCsv, processStatus, getProjectList, getAnalysisResult, getOriginalReview, getWordTrend, heartbeat, deleteUser, crawlProductBasicInfo };
