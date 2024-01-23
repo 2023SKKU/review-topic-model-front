@@ -28,7 +28,7 @@ const Analysis = () => {
             setFilename(res.p_data[0].csvname);
             setPros(res.p_data[0].pros);
             setCons(res.p_data[0].cons);
-            setTrend(res.p_data[0].trend);
+            setTrend([res.p_data[0].trend, res.decomposed_trend, res.decomposed_seasonal]);
             setTrendWarning(res.p_data[0].trend_warning);
             setDtm(res.dtm_result);
             
@@ -79,7 +79,7 @@ const Analysis = () => {
                     <GraphWrapper>
                         <GraphText>트렌드 예측 그래프</GraphText>
                         { trendWarning ? <SmallLoadingText>※ 지난 3개년 간의 검색량이 부족하여 예측의 정확도가 매우 낮을 수 있습니다.</SmallLoadingText> : <></>}
-                        <div style={{width: '100%', display: 'flex', justifyContent: 'center', height: '80%'}}>
+                        <div style={{width: '110%', display: 'flex', justifyContent: 'center', height: '80%'}}>
                         {   trend.length == 0 ? <LoadingText>로딩중...</LoadingText> : (trend[0] === -1 ? <LoadingText>트렌드 예측이 수행되지 않았습니다.</LoadingText> : <TrendChart frequency={trend} x={dateList} label="검색량 추이" />)}
                         </div>
                     </GraphWrapper>
@@ -112,6 +112,7 @@ const GraphText = styled.div`
     font-size: 1.75rem;
     font-weight: bold;
     margin-top: 50px;
+    overflow-x: auto;
 `;
 
 const DownloadBtn = styled.button`
