@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar/NavBar';
 import { startAnalysis, processStatus, crawlProductBasicInfo } from '../util/getData';
-import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
 
 const LOAD_CHECK = {
     INIT: 0,
@@ -12,16 +10,7 @@ const LOAD_CHECK = {
     ERROR: 3,
 };
 
-const Home = ({ clientID, status, changeStatus }) => {
-    const messages = [
-        '리뷰를 크롤링하고 있어요',
-        '토픽 모델링을 진행하고 있어요',
-        'DTM을 진행하고 있어요',
-        '트렌드를 예측하고 있어요',
-        '분석이 완료되었습니다.',
-        '문제가 발생했습니다.',
-    ];
-
+const Home = () => {
     const [url, setUrl] = useState('');
     const [productName, setProductName] = useState('');
     const [category, setCategory] = useState('');
@@ -59,10 +48,13 @@ const Home = ({ clientID, status, changeStatus }) => {
         setProjectName(e.target.value);
     };
 
-    const handleStartAnalysis = () => {
-        if (status === processStatus.BEFORE_START || status === processStatus.END) {
-            changeStatus(1);
-            startAnalysis(url, projectName, productName, category, clientID);
+    const handleStartAnalysis = async () => {
+        const data = await startAnalysis(url, projectName, productName, category);
+        console.log(data);
+        if (data.success) {
+            alert('분석이 성공적으로 시작되었습니다.');
+        } else {
+            alert(data.message);
         }
     };
 
@@ -84,11 +76,10 @@ const Home = ({ clientID, status, changeStatus }) => {
                     <TitleText>리뷰를 수집할 상품 링크를 입력해주세요</TitleText>
                     <ul>
                         <SmallList>
-                            네이버 스마트스토어 링크만 가능해요 (smartstore.naver.com, brand.naver.com)
+                            네이버 스마트스토어 링크만 가능해요 (smartstore.naver.com,
+                            brand.naver.com)
                         </SmallList>
-                        <SmallList>
-                            링크가 'https://'로 시작하도록 해주세요 
-                        </SmallList>
+                        <SmallList>링크가 'https://'로 시작하도록 해주세요</SmallList>
                     </ul>
                     <WhiteContainer>
                         <LinkInput onChange={onChangeUrl} value={url} placeholder="링크 입력" />
@@ -103,7 +94,7 @@ const Home = ({ clientID, status, changeStatus }) => {
                                         <ProductName>
                                             리뷰 개수: {productBasicInfo.review_cnt}개{' '}
                                             <span style={{ fontSize: '1rem' }}>
-                                                (최대 20,000개까지 수집, 현재 테스트 버전에서는 2,000개)
+                                                (최대 20,000개까지 수집)
                                             </span>
                                         </ProductName>
                                         {productBasicInfo.review_cnt < 1000 ? (
@@ -129,7 +120,14 @@ const Home = ({ clientID, status, changeStatus }) => {
                                     placeholder="상품 이름"
                                 />
                                 <SmallText>추천 키워드</SmallText>
-                                <div style={{ display: 'flex', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        width: '100%',
+                                        overflowX: 'auto',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
                                     {Object.keys(productBasicInfo).length !== 0 ? (
                                         [
                                             productBasicInfo.model_name,
@@ -147,7 +145,7 @@ const Home = ({ clientID, status, changeStatus }) => {
                                                         {word}
                                                     </WordContainer>
                                                 );
-                                            } else return <></>
+                                            } else return <></>;
                                         })
                                     ) : (
                                         <></>
@@ -188,7 +186,7 @@ const Home = ({ clientID, status, changeStatus }) => {
                                 >
                                     시작하기
                                 </StartBtn>
-                                <ProgressWrapper available={status != processStatus.BEFORE_START}>
+                                {/*<ProgressWrapper available={status != processStatus.BEFORE_START}>
                                     <LinearProgress variant="determinate" value={status * 20} />
                                     <div
                                         style={{
@@ -212,11 +210,11 @@ const Home = ({ clientID, status, changeStatus }) => {
                                             <CircularProgress color="secondary" />
                                         </div>
                                     </div>
-                                </ProgressWrapper>
+                                        </ProgressWrapper>*/}
                             </ProductInfoWrapper>
                         ) : (
                             <Loading>
-                                 {loadingStatus === LOAD_CHECK.INIT
+                                {loadingStatus === LOAD_CHECK.INIT
                                     ? '링크를 입력하세요'
                                     : loadingStatus === LOAD_CHECK.LOADING
                                     ? '로딩중...'

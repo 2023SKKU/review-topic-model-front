@@ -1,23 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar/NavBar';
-import { getProjectList } from '../util/getData';
+import { getProjectList, getProjectStatus } from '../util/getData';
 import { Link } from 'react-router-dom';
+import RefreshIcon from '../assets/refresh.svg?react';
 
 const List = () => {
-
     const [projectList, setProjectList] = useState([]);
+    const [statusList, setStatusList] = useState({});
+    const [updateSec, setUpdateSec] = useState(0);
 
-    const handleGetProjectList = async () => {
+    const messages = [
+        '리뷰를 크롤링하고 있어요 (1/4)',
+        '토픽 모델링을 진행하고 있어요 (2/4)',
+        'DTM을 진행하고 있어요 (3/4)',
+        '트렌드를 예측하고 있어요 (4/4)',
+        '분석이 완료되었습니다.',
+        '문제가 발생했습니다.',
+    ];
+
+    const handleGetLists = async () => {
+        setUpdateSec(0);
         const list = await getProjectList();
         if (list.success) {
             setProjectList(list.list);
-            console.log('list', list);
         }
-    }
+
+        const status_list = await getProjectStatus();
+        setStatusList(status_list);
+    };
 
     useEffect(() => {
-        handleGetProjectList();
+        handleGetLists();
+
+        const hb = setInterval(() => {
+            setUpdateSec((prev) => prev + 1);
+        }, 1000);
+
+        return () => {
+            clearInterval(hb);
+        };
     }, []);
 
     return (
@@ -31,25 +53,60 @@ const List = () => {
                             <ID>id</ID>
                             <ProjectName>프로젝트 이름</ProjectName>
                         </TableTitleWrapper>
-                        {projectList == undefined ? <LoadingText /> : projectList.map((info, idx) => {
-                            return (
-                                <ItemWrapper key={idx} to={`/analysis/${info.id}`}>
-                                    <ID>{info.id}</ID>
-                                    <ProjectName>{info.project_name}</ProjectName>
-                                </ItemWrapper>
-                            );
-                        })}
+                        {projectList == undefined ? (
+                            <LoadingText />
+                        ) : (
+                            projectList.map((info, idx) => {
+                                return (
+                                    <ItemWrapper key={idx} to={`/analysis/${info.id}`}>
+                                        <ID>{info.id}</ID>
+                                        <ProjectName>{info.project_name}</ProjectName>
+                                    </ItemWrapper>
+                                );
+                            })
+                        )}
+                    </WhiteContainer>
+
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <TitleText>분석 진행중인 프로젝트의 상태를 확인하세요</TitleText>
+                        <RefreshIcon
+                            width={30}
+                            height={30}
+                            style={{ cursor: 'pointer', marginTop: '80px', marginLeft: '10px' }}
+                            onClick={handleGetLists}
+                        />
+                        <div style={{ marginTop: '85px', marginLeft: '10px' }}>
+                            마지막 업데이트: <span>{updateSec}</span>초 전
+                        </div>
+                    </div>
+                    <WhiteContainer>
+                        <TableTitleWrapper>
+                            <ID>프로젝트 이름</ID>
+                            <ProjectName>상태</ProjectName>
+                        </TableTitleWrapper>
+                        {statusList == undefined ? (
+                            <LoadingText />
+                        ) : (
+                            Object.keys(statusList).map((name, idx) => {
+                                return (
+                                    <ItemWrapper key={idx} to={`/analysis/${name}`}>
+                                        <ID>{name}</ID>
+                                        <ProjectName>{messages[statusList[name] - 1]}</ProjectName>
+                                    </ItemWrapper>
+                                );
+                            })
+                        )}
                     </WhiteContainer>
                 </LeftContainer>
             </FullWrapper>
         </>
     );
-}
+};
 
 const FullWrapper = styled.div`
     width: 100vw;
     height: 100vh;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
     display: flex;
 `;
 
@@ -62,7 +119,7 @@ const LeftContainer = styled.div`
 const TitleText = styled.div`
     font-size: 2rem;
     font-weight: bold;
-    margin-top: 200px;
+    margin-top: 100px;
     margin-bottom: 20px;
 `;
 
@@ -89,7 +146,6 @@ const LoadingText = styled.div`
     line-height: 370px;
 `;
 
-
 const TableTitleWrapper = styled.div`
     width: 95%;
     height: 30px;
@@ -108,7 +164,7 @@ const ItemWrapper = styled(Link)`
     display: flex;
     border-bottom: 1px solid black;
     &:hover {
-        background-color: #F9F9F9;
+        background-color: #f9f9f9;
     }
 `;
 
@@ -121,6 +177,5 @@ const ProjectName = styled.div`
     width: 70%;
     text-align: center;
 `;
-
 
 export default List;

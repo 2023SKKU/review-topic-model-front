@@ -15,42 +15,42 @@ function App() {
     // const webSocket = useRef(null);
     // const wsUrl = 'ws://localhost:8000/ws/';
 
-    const [analysisStatus, setAnalysisStatus] = useState(processStatus.BEFORE_START);
+    // const [analysisStatus, setAnalysisStatus] = useState(processStatus.BEFORE_START);
 
-    const handleAddUser = async () => {
-        await addUser(clientID);
-    }
+    // const handleAddUser = async () => {
+    //     await addUser(clientID);
+    // }
 
-    useEffect(() => {
-        // console.log(wsUrl+clientID);
-        // if (localStorage['analysisStatus'] != undefined) {
-        //     if (localStorage['analysisStatus'] == '5') setAnalysisStatus(0);
-        //     else setAnalysisStatus(Number(localStorage['analysisStatus']));
-        // }
-        // startSocket();
-        // clientID ??= v4();
-        handleAddUser();
-        const hb = setInterval(async () => {
-            console.log('sdfg', analysisStatus);
-            // if (analysisStatus != processtatus.BEFORE_START) {
-                const res = await heartbeat(clientID);
-                console.log(res);
-                setAnalysisStatus(res);
-            // }
-        }, 20000);
+    // useEffect(() => {
+    //     // console.log(wsUrl+clientID);
+    //     // if (localStorage['analysisStatus'] != undefined) {
+    //     //     if (localStorage['analysisStatus'] == '5') setAnalysisStatus(0);
+    //     //     else setAnalysisStatus(Number(localStorage['analysisStatus']));
+    //     // }
+    //     // startSocket();
+    //     // clientID ??= v4();
+    //     handleAddUser();
+    //     const hb = setInterval(async () => {
+    //         console.log('sdfg', analysisStatus);
+    //         // if (analysisStatus != processtatus.BEFORE_START) {
+    //             const res = await heartbeat(clientID);
+    //             console.log(res);
+    //             setAnalysisStatus(res);
+    //         // }
+    //     }, 20000);
 
-        return () => {
-            clearInterval(hb);
-            deleteUser(clientID);
-        };
-      }, []);
+    //     return () => {
+    //         clearInterval(hb);
+    //         deleteUser(clientID);
+    //     };
+    //   }, []);
 
     return (
         <>
             <GlobalStyle />
             <BrowserRouter>
                 <Routes>
-                    <Route exact path="/" element={<Home clientID={clientID} status={analysisStatus} changeStatus={setAnalysisStatus} />} />
+                    <Route exact path="/" element={<Home />} />
                     <Route path="/list" element={<List />} />
                     <Route path="/analysis/:productid" element={<Analysis />} />
                 </Routes>
